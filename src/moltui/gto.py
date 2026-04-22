@@ -119,7 +119,7 @@ def parse_molden(filepath: str | Path) -> MoldenBasis:
             i += 1
             while i < len(lines) and _section_tag(lines[i]) is None:
                 parts = lines[i].split()
-                if len(parts) >= 2 and parts[0].isdigit():
+                if parts and parts[0].isdigit():
                     atom_idx = int(parts[0]) - 1  # 1-based to 0-based
                     i += 1
                     # Read shells for this atom
@@ -128,7 +128,7 @@ def parse_molden(filepath: str | Path) -> MoldenBasis:
                         if not sline or _section_tag(sline) is not None:
                             break
                         sparts = sline.split()
-                        if len(sparts) >= 2 and sparts[0].isdigit():
+                        if sparts and sparts[0].isdigit():
                             break
                         shell_type = sparts[0].lower()
                         nprim = int(sparts[1])

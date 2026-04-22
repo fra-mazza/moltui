@@ -192,6 +192,61 @@ Occup= 2.0
     assert ao.shape == (1, 9)
 
 
+def test_parse_molden_openmolcas_gto_style(tmp_path: Path) -> None:
+    """OpenMolcas emits single-token atom-index lines and no scale factor in [GTO]."""
+    path = _write_molden(
+        tmp_path,
+        """[Molden Format]
+[Atoms] (AU)
+C   1   6   0.000000000   0.000000000   0.000000000
+H   2   1   1.188987000   1.188987000   1.188987000
+[5D]
+[7F]
+[GTO] (AU)
+   1
+   s   2
+  6.665000000E+03  6.920001793E-04
+  1.000000000E+03  5.329001381E-03
+   p   1
+  9.439000000E+00  3.810902127E-02
+
+   2
+   s   1
+  1.596000000E-01  1.000000000E+00
+
+[MO]
+Sym= A1
+Ene= -11.2154
+Spin= Alpha
+Occup= 2.0
+1  0.99
+2  0.01
+3  0.00
+4  0.00
+Sym= A1
+Ene= -0.9350
+Spin= Alpha
+Occup= 2.0
+1  0.00
+2  0.60
+3  0.40
+4  0.00
+""",
+    )
+
+    basis = parse_molden(path)
+
+    # Two atoms, three shells (s+p on C, s on H)
+    assert len(basis.atom_symbols) == 2
+    assert basis.atom_symbols[0] == "C"
+    assert basis.atom_symbols[1] == "H"
+    assert len(basis.shells) == 3  # C: s + p, H: s
+    assert basis.shells[0].l == 0  # s on C
+    assert basis.shells[1].l == 1  # p on C
+    assert basis.shells[2].l == 0  # s on H
+    assert basis.mo_coefficients.shape == (4, 2)
+
+
 def test_load_molden_data_accepts_normal_modes_only_file(tmp_path: Path) -> None:
     """Normal-modes-only Molden files should load geometry and mode vectors."""
     path = _write_molden(
