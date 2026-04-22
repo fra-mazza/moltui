@@ -31,6 +31,12 @@ class TestGetElement:
     def test_whitespace_stripped(self):
         assert get_element("  O  ").symbol == "O"
 
+    def test_trailing_digits_stripped(self):
+        """OpenMolcas-style atom names like 'C1', 'Fe2' should resolve correctly."""
+        assert get_element("C1").symbol == "C"
+        assert get_element("H2").symbol == "H"
+        assert get_element("Fe3").symbol == "Fe"
+
     def test_unknown_returns_default(self):
         e = get_element("Xx")
         assert e is DEFAULT_ELEMENT

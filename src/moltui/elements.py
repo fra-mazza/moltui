@@ -125,7 +125,8 @@ ATOMIC_NUMBER_TO_SYMBOL: dict[int, str] = {e.atomic_number: e.symbol for e in EL
 
 
 def get_element(symbol: str) -> Element:
-    key = symbol.strip().capitalize()
+    alpha_only = "".join(c for c in symbol.strip() if c.isalpha())
+    key = alpha_only.capitalize()
     return ELEMENTS.get(key, DEFAULT_ELEMENT)
 
 
